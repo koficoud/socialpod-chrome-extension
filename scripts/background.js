@@ -6,11 +6,15 @@ const COMPLETE = 'complete';
 
 // Request patterns.
 const likePattern = /^https:\/\/www.instagram.com\/web\/likes\/(\w+)\/like\//;
-const unlikePatter = /^https:\/\/www.instagram.com\/web\/likes\/(\w+)\/unlike\//;
+const unlikePattern = /^https:\/\/www.instagram.com\/web\/likes\/(\w+)\/unlike\//;
+const followPattern = /^https:\/\/www.instagram.com\/web\/friendships\/(\w+)\/follow\//;
+const unfollowPattern = /^https:\/\/www.instagram.com\/web\/friendships\/(\w+)\/unfollow\//;
 
 // Event names.
 const LIKE = 'LIKE';
 const UNLIKE = 'UNLIKE';
+const FOLLOW = 'FOLLOW';
+const UNFOLLOW = 'UNFOLLOW';
 
 // Instagram URL.
 const INSTAGRAM_URL = 'https://www.instagram.com/';
@@ -18,8 +22,13 @@ const INSTAGRAM_URL = 'https://www.instagram.com/';
 const networkFilter = {
   urls: ['https://www.instagram.com/*'],
 };
+
 // Instagram viewer data.
 let viewer;
+// Instagram post data.
+let post;
+// Instagram profile data.
+let profile;
 
 /**
  * Make request to Socialpod server.
@@ -47,10 +56,17 @@ chrome.webRequest.onCompleted.addListener((details) => {
   if (likePattern.test(url)) {
     makeRequest(LIKE, viewer, details);
   }
-
   // The user does not like the post.
-  if (unlikePatter.test(url)) {
+  if (unlikePattern.test(url)) {
     makeRequest(UNLIKE, viewer, details);
+  }
+  // The user started to follow.
+  if (followPattern.test(url)) {
+    makeRequest(FOLLOW, viewer, details);
+  }
+  // The user stopped following.
+  if (unfollowPattern.test(url)) {
+    makeRequest(UNFOLLOW, viewer, details);
   }
 }, networkFilter);
 
@@ -62,14 +78,26 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (url.indexOf(INSTAGRAM_URL) !== -1 && status === COMPLETE) {
     // Get Instagram shared data.
     chrome.tabs.sendMessage(tabId, GET_SHARED_DATA, (sharedData) => {
+      if (!sharedData) {
+        return;
+      }
+
       if (!sharedData.config.viewer) {
         viewer = null;
 
         return;
       }
 
-      const { viewer: viewerData } = sharedData.config;
+      // Set post data.
+      if (sharedData.entry_data.PostPage) {
+        post = sharedData.entry_data.PostPage[0].graphql.shortcode_media;
+      }
+      // Set profile data.
+      if (sharedData.entry_data.ProfilePage) {
+        profile = sharedData.entry_data.ProfilePage[0].graphql.user;
+      }
 
+      const { viewer: viewerData } = sharedData.config;
       // Set viewer data.
       viewer = viewerData;
     });
