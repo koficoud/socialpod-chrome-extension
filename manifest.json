@@ -6,7 +6,8 @@
     "activeTab",
     "tabs",
     "webRequest",
-    "*://*/"
+    "*://*.instagram.com/",
+    "*://*.willinagency.com/"
   ],
   "background": {
     "scripts": ["scripts/background.js"]
