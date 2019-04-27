@@ -9,12 +9,16 @@ const likePattern = /^https:\/\/www.instagram.com\/web\/likes\/(\w+)\/like\//;
 const unlikePattern = /^https:\/\/www.instagram.com\/web\/likes\/(\w+)\/unlike\//;
 const followPattern = /^https:\/\/www.instagram.com\/web\/friendships\/(\w+)\/follow\//;
 const unfollowPattern = /^https:\/\/www.instagram.com\/web\/friendships\/(\w+)\/unfollow\//;
+const savePattern = /^https:\/\/www.instagram.com\/web\/save\/(\w+)\/save\//;
+const unsavePattern = /^https:\/\/www.instagram.com\/web\/save\/(\w+)\/unsave\//;
 
 // Event names.
 const LIKE = 'LIKE';
 const UNLIKE = 'UNLIKE';
 const FOLLOW = 'FOLLOW';
 const UNFOLLOW = 'UNFOLLOW';
+const SAVE = 'SAVE';
+const UNSAVE = 'UNSAVE';
 
 // Instagram URL.
 const INSTAGRAM_URL = 'https://www.instagram.com/';
@@ -33,19 +37,18 @@ let profile;
 /**
  * Make request to Socialpod server.
  * @param {String} eventName
- * @param {Object} viewerData
  * @param {Object} requestDetails
  */
-const makeRequest = (eventName, viewerData, requestDetails) => {
+const makeRequest = (eventName, requestDetails) => {
   // No viewer information
-  if (!viewerData) {
+  if (!viewer) {
     alert('Para que la extensión de Socialpod funcione recarga la página e inicia sesión.');
 
     return;
   }
 
   console.log('Make request to Soclalpod.');
-  console.log(eventName, viewerData, requestDetails);
+  console.log(eventName, viewer, requestDetails);
 };
 
 // Fired when a request is completed..
@@ -54,19 +57,27 @@ chrome.webRequest.onCompleted.addListener((details) => {
 
   // The user likes the post.
   if (likePattern.test(url)) {
-    makeRequest(LIKE, viewer, details);
+    makeRequest(LIKE, details);
   }
   // The user does not like the post.
   if (unlikePattern.test(url)) {
-    makeRequest(UNLIKE, viewer, details);
+    makeRequest(UNLIKE, details);
   }
   // The user started to follow.
   if (followPattern.test(url)) {
-    makeRequest(FOLLOW, viewer, details);
+    makeRequest(FOLLOW, details);
   }
   // The user stopped following.
   if (unfollowPattern.test(url)) {
-    makeRequest(UNFOLLOW, viewer, details);
+    makeRequest(UNFOLLOW, details);
+  }
+  // the user saved.
+  if (savePattern.test(url)) {
+    makeRequest(SAVE, details);
+  }
+  // The user unsaved.
+  if (unsavePattern.test(url)) {
+    makeRequest(UNSAVE, details);
   }
 }, networkFilter);
 
