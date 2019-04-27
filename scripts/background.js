@@ -1,5 +1,7 @@
 // Message constants.
 const GET_SHARED_DATA = 'GET_SHARED_DATA';
+// eslint-disable-next-line no-underscore-dangle
+const SHARE_ = 'SHARE_';
 
 // Status constants.
 const COMPLETE = 'complete';
@@ -47,6 +49,19 @@ const makeRequest = (eventName, requestDetails) => {
     return;
   }
 
+  // No post data.
+  if (eventName !== FOLLOW && eventName !== UNFOLLOW && !post) {
+    alert('Hubo un error, por favor recarga la página y vuelve a realizar la acción.');
+
+    return;
+  }
+  // No profile data.
+  if ((eventName === FOLLOW || eventName === UNFOLLOW) && !profile) {
+    alert('Hubo un error, por favor recarga la página y vuelve a realizar la acción.');
+
+    return;
+  }
+
   console.log('Make request to Soclalpod.');
   console.log(eventName, viewer, requestDetails);
 };
@@ -80,6 +95,15 @@ chrome.webRequest.onCompleted.addListener((details) => {
     makeRequest(UNSAVE, details);
   }
 }, networkFilter);
+
+// Fired when a message is sent from either an extension process
+// (by runtime.sendMessage) or a content script (by tabs.sendMessage).
+chrome.runtime.onMessage.addListener((request) => {
+  const { event } = request;
+  if (event.indexOf(SHARE_) !== -1) {
+    makeRequest(event, {});
+  }
+});
 
 // Fired when a tab is updated.
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
