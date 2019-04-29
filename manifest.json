@@ -16,6 +16,10 @@
     {
       "matches": ["https://*.instagram.com/*"],
       "js": ["scripts/ig.js"]
+    },
+    {
+      "matches": ["https://app1.willinagency.com/*"],
+      "js": ["scripts/sp.js"]
     }
   ],
   "icons": {
