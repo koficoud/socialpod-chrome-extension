@@ -1,3 +1,6 @@
+// API key.
+const API_KEY = 'sZzAS6Bh4AyxlhXkVpw8iymVXzTd9yxy';
+
 // Message constants.
 const GET_SHARED_DATA = 'GET_SHARED_DATA';
 // eslint-disable-next-line no-underscore-dangle
@@ -24,6 +27,9 @@ const UNSAVE = 'UNSAVE';
 
 // Instagram URL.
 const INSTAGRAM_URL = 'https://www.instagram.com/';
+// API endpoint.
+const CREATE_IG_LOG_ROUTE = 'https://administration.willinagency.com/api/v3/instagram-logs';
+
 // Network filter for listen web request.
 const networkFilter = {
   urls: ['https://www.instagram.com/*'],
@@ -42,6 +48,9 @@ let profile;
  * @param {Object} requestDetails
  */
 const makeRequest = (eventName, requestDetails) => {
+  let target;
+  let targetId;
+
   // No viewer information
   if (!viewer) {
     alert('Para que la extensión de Socialpod funcione recarga la página e inicia sesión.');
@@ -62,8 +71,39 @@ const makeRequest = (eventName, requestDetails) => {
     return;
   }
 
-  console.log('Make request to Soclalpod.');
-  console.log(eventName, viewer, requestDetails);
+  // Determine target and target ID.
+  if (eventName === FOLLOW || eventName === UNFOLLOW) {
+    target = 'username';
+    targetId = profile.username;
+  } else {
+    target = 'shortcode';
+    targetId = post.shortcode;
+  }
+
+  fetch(CREATE_IG_LOG_ROUTE, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      apiKey: API_KEY,
+      target,
+      targetId,
+      username: viewer.username,
+      fullName: viewer.full_name,
+      ip: requestDetails.ip,
+      event: eventName,
+    }),
+  }).then(res => res.json())
+    .then(() => {
+      if (!eventName.startsWith('UN')) {
+        alert('Bien hecho, ahora puedes recoger tu recompensa en Socialpod.');
+      } else {
+        alert('Sí deshaces la acción no podrás recoger tu recompensa.');
+      }
+    }).catch(() => {
+      alert('Hubo un error, por favor recarga la página y vuelve a realizar la acción.');
+    });
 };
 
 // Fired when a request is completed..
