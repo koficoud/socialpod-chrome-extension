@@ -95,14 +95,9 @@ const makeRequest = (eventName, requestDetails) => {
       event: eventName,
     }),
   }).then(res => res.json())
-    .then(() => {
-      if (!eventName.startsWith('UN')) {
-        alert('Bien hecho, ahora puedes recoger tu recompensa en Socialpod.');
-      } else {
-        alert('Sí deshaces la acción no podrás recoger tu recompensa.');
-      }
-    }).catch(() => {
-      alert('Hubo un error, por favor recarga la página y vuelve a realizar la acción.');
+    .then((instagramLog) => {
+      // eslint-disable-next-line no-console
+      console.log(instagramLog);
     });
 };
 
