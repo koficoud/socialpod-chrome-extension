@@ -29,6 +29,7 @@ const UNSAVE = 'UNSAVE';
 const INSTAGRAM_URL = 'https://www.instagram.com/';
 // API endpoint.
 const CREATE_IG_LOG_ROUTE = 'https://administration.willinagency.com/api/v3/instagram-logs';
+const CHECK_FOLLOWER_ROUTE = 'https://administration.willinagency.com/api/v3/drop-collectors/check-follower';
 
 // Network filter for listen web request.
 const networkFilter = {
@@ -137,6 +138,25 @@ chrome.runtime.onMessage.addListener((request) => {
   const { event } = request;
   if (event.indexOf(SHARE_) !== -1) {
     makeRequest(event, {});
+  }
+
+  if (event === 'check-follower') {
+    fetch(CHECK_FOLLOWER_ROUTE, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        followsViewer: request.followsViewer,
+        id: request.id,
+        owner: request.owner,
+        user: request.user,
+      }),
+    }).then(res => res.json())
+      .then((dropCollector) => {
+        // eslint-disable-next-line no-console
+        console.log(dropCollector);
+      });
   }
 });
 

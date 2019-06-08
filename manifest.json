@@ -1,6 +1,6 @@
 {
   "name": "Socialpod",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Mediante el apoyo crecemos juntos.",
   "permissions": [
     "activeTab",
@@ -10,16 +10,26 @@
     "*://*.willinagency.com/"
   ],
   "background": {
-    "scripts": ["scripts/background.js"]
+    "scripts": [
+      "scripts/background.js"
+    ]
   },
   "content_scripts": [
     {
-      "matches": ["https://*.instagram.com/*"],
-      "js": ["scripts/ig.js"]
+      "matches": [
+        "https://*.instagram.com/*"
+      ],
+      "js": [
+        "scripts/ig.js"
+      ]
     },
     {
-      "matches": ["https://app1.willinagency.com/*"],
-      "js": ["scripts/sp.js"]
+      "matches": [
+        "https://app1.willinagency.com/*"
+      ],
+      "js": [
+        "scripts/sp.js"
+      ]
     }
   ],
   "icons": {

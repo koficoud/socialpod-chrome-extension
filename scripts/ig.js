@@ -58,11 +58,38 @@ if (shareIcon) {
   });
 }
 
+/**
+ * Check follower.
+ */
+const checkFollower = (sharedData) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const dropCollector = urlParams.get('dropCollector');
+
+  if (!dropCollector || !sharedData) {
+    return;
+  }
+
+  // Extract viewer and owner.
+  const { viewer } = sharedData.config;
+  const profilePage = sharedData.entry_data.ProfilePage[0].graphql.user;
+
+  chrome.runtime.sendMessage({
+    event: 'check-follower',
+    id: dropCollector,
+    owner: viewer.username,
+    user: profilePage.username,
+    followsViewer: profilePage.follows_viewer,
+  });
+
+  window.close();
+};
+
 // Fired when a message is sent from either an extension process
 // (by runtime.sendMessage) or a content script (by tabs.sendMessage).
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message === GET_SHARED_DATA) {
     window.addEventListener(`${chrome.runtime.id}-config`, (event) => {
+      checkFollower(event.detail);
       sendResponse(event.detail);
     }, { once: true });
     window.dispatchEvent(new Event(chrome.runtime.id));
